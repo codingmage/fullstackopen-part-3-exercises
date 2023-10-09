@@ -55,9 +55,14 @@ app.get('/api/persons', (request, response) => {
 })
 
 app.get('/api/info', (req, res) => {
-  const numberOfPeople = persons.length
   const currentTime = new Date()
-  res.send(`<p>Phonebook has info for ${numberOfPeople} people</p> <p>${currentTime}</p>`)
+
+  Person.countDocuments({})
+    .then(count => {
+      res.send(`<p>Phonebook has info for ${count} people</p> <p>${currentTime}</p>`)
+    })
+  
+  /* res.send(`<p>Phonebook has info for ${numberOfPeople} people</p> <p>${currentTime}</p>`) */
 })
 
 app.get('/api/persons/:id', (req, res, next) => {
@@ -107,24 +112,20 @@ app.post('/api/persons', (req, res, next) => {
     })
   }
 
-  const alreadyExists = Person.findOne({ name: body.name })
-
-  console.log(alreadyExists)
+/*   const alreadyExists = Person.findOne({ name: body.name })
 
   if(alreadyExists) {
-    console.log('Person already in the phonebook. Updating their number...')
-    next()
-  } 
+    Person.findOne({ name: body.name })
+      .then(returnedData => {
+        console.log(returnedData._id.toString())
+      })
+    console.log('Person already in the phonebook.')
+  }  */
 
   const person = new Person({
     name: body.name,
     number: body.number,
   })
-/*     id: generateId(), */
-
-/*   persons = persons.concat(person)
-
-  res.json(person) */
 
   person.save().then(savedPerson => {
     res.json(savedPerson)
@@ -132,7 +133,6 @@ app.post('/api/persons', (req, res, next) => {
 })
 
 app.put('/api/persons/:id', (req, res, next) => {
-  console.log(req)
   const body = req.body
 
 /*   if I wanted to allow name change as well:
@@ -142,9 +142,7 @@ app.put('/api/persons/:id', (req, res, next) => {
     number: body.number,
   } */
 
-  const newNumber = {
-    number: body.number,
-  }
+  const newNumber = body.number
 
   Person.findByIdAndUpdate(req.params.id, { $set: { number: newNumber } }, { new: true } )
     .then(updatedPerson => {
