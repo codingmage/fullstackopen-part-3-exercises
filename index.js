@@ -1,6 +1,8 @@
+require('dotenv').config()
 const express = require('express')
 const morgan = require('morgan')
 const cors = require('cors')
+const Person = require('./models/person')
 
 const app = express()
 
@@ -46,8 +48,10 @@ app.get('/', (req, res) => {
     res.send('<h1>Test</h1>')
   })
 
-app.get('/api/persons', (req, res) => {
-    res.json(persons)
+app.get('/api/persons', (request, response) => {
+  Person.find({}).then(persons => {
+    response.json(persons)
+  })
 })
 
 app.get('/api/info', (req, res) => {
@@ -57,14 +61,17 @@ app.get('/api/info', (req, res) => {
 })
 
 app.get('/api/persons/:id', (req, res) => {
-  const id = Number(req.params.id)
+  Person.findById(req.params.id).then(person => {
+    res.json(person)
+  })
+/*   const id = Number(req.params.id)
   const person = persons.find(person => person.id === id)
 
   if (person) {
     res.json(person)
   } else {
     res.status(404).end()
-  }
+  } */
 })
 
 app.delete('/api/persons/:id', (req, res) => {
@@ -93,27 +100,31 @@ app.post('/api/persons', (req, res) => {
     })
   }
 
-  const alreadyExists = persons.some(person => person.name === body.name)
+/*   const alreadyExists = persons.some(person => person.name === body.name)
 
   if(alreadyExists) {
     return res.status(400).json({
       error: 'person already exists'
     })
-  }
+  } */
 
-  const person = {
+  const person = new Person({
     name: body.name,
     number: body.number,
-    id: generateId(),
-  }
+  })
+/*     id: generateId(), */
 
-  persons = persons.concat(person)
+/*   persons = persons.concat(person)
 
-  res.json(person)
+  res.json(person) */
+
+  person.save().then(savedPerson => {
+    res.json(savedPerson)
+  })
 })
 
 
-const PORT = process.env.PORT || 3001
+const PORT = process.env.PORT
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`)
 })
