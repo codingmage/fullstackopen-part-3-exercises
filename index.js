@@ -13,7 +13,7 @@ app.use(express.json())
 app.use(cors())
 
 app.use(morgan(":method :url :status :res[content-length] - :response-time ms :info"))
-morgan.token("info", (req, res) => {
+morgan.token("info", (req) => {
 	if (req.method === "POST") {
 		return JSON.stringify(req.body)
 	} else {
@@ -87,9 +87,7 @@ app.get("/api/persons/:id", (req, res, next) => {
 
 app.delete("/api/persons/:id", (req, res, next) => {
 	Person.findByIdAndRemove(req.params.id)
-		.then(result => {
-			res.status(204).end()
-		})
+		.then(res.status(204).end())
 		.catch(error => next(error))
 })
 

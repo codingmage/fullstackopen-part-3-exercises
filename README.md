@@ -1,1 +1,1 @@
-Link to online application: https://render-phonebook-o3py.onrender.com
+Link to online application (backend only): https://render-phonebook-o3py.onrender.com
